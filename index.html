@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="ko">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>test</title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, "Malgun Gothic", "맑은 고딕", helvetica,
+                    "Apple SD Gothic Neo", sans-serif;
+                background-color: #ffffff;
+                color: #000000;
+                margin: 0;
+                padding: 20px;
+                line-height: 1.5;
+                min-height: 100vh;
+            }
+
+            .main-layout {
+                display: flex;
+                gap: 30px;
+                max-width: 1400px;
+                margin: 0 auto;
+                min-height: calc(100vh - 40px);
+            }
+
+            .map-section {
+                flex: 1;
+                min-width: 400px;
+            }
+
+            .content-section {
+                flex: 1;
+                min-width: 400px;
+            }
+
+            .container {
+                text-align: center;
+                padding: 40px;
+                border-radius: 8px;
+                background-color: #ffffff;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+                width: 100%;
+                height: fit-content;
+            }
+
+            .map-container {
+                background-color: #ffffff;
+                border-radius: 8px;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+                padding: 20px;
+                height: fit-content;
+                min-height: 600px;
+            }
+
+            .map-title {
+                font-size: 24px;
+                font-weight: 700;
+                color: #03c75a;
+                margin-bottom: 20px;
+                text-align: center;
+            }
+
+            #map {
+                width: 100%;
+                height: 500px;
+                border-radius: 8px;
+                border: 2px solid #e9ecef;
+            }
+
+            @media (max-width: 1024px) {
+                .main-layout {
+                    flex-direction: column;
+                    gap: 20px;
+                }
+
+                .map-section,
+                .content-section {
+                    min-width: auto;
+                }
+
+                #map {
+                    height: 400px;
+                }
+            }
+
+            .main-title {
+                font-size: 64px;
+                font-weight: 700;
+                color: #dc3545;
+                margin-bottom: 20px;
+                letter-spacing: -1px;
+            }
+
+            .subtitle {
+                font-size: 16px;
+                color: #666666;
+                margin-bottom: 30px;
+                font-weight: 400;
+            }
+
+            .divider {
+                width: 60px;
+                height: 2px;
+                background-color: #03c75a;
+                margin: 0 auto 30px;
+            }
+
+            .description {
+                font-size: 14px;
+                color: #888888;
+                line-height: 1.6;
+            }
+
+            @media (max-width: 768px) {
+                .main-title {
+                    font-size: 48px;
+                }
+
+                .container {
+                    padding: 30px 20px;
+                    margin: 20px;
+                }
+            }
+
+            @media (max-width: 480px) {
+                .main-title {
+                    font-size: 36px;
+                }
+            }
+
+            /* 네이버 스타일의 미묘한 애니메이션 효과 */
+            .container {
+                animation: fadeIn 0.8s ease-out;
+            }
+
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(20px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .main-title {
+                transition: transform 0.3s ease;
+            }
+
+            .main-title:hover {
+                transform: scale(1.05);
+            }
+
+            /* 파일 업로드 섹션 스타일 */
+            .upload-section {
+                margin: 30px 0;
+            }
+
+            .upload-area {
+                border: 2px dashed #03c75a;
+                border-radius: 8px;
+                padding: 40px 20px;
+                text-align: center;
+                background-color: #f8fff9;
+                transition: all 0.3s ease;
+                cursor: pointer;
+            }
+
+            .upload-area:hover {
+                background-color: #f0fff0;
+                border-color: #02b050;
+            }
+
+            .upload-area.dragover {
+                background-color: #e8f5e8;
+                border-color: #02b050;
+                transform: scale(1.02);
+            }
+
+            .upload-icon {
+                font-size: 48px;
+                margin-bottom: 10px;
+            }
+
+            .upload-text {
+                color: #666;
+                margin-bottom: 15px;
+                font-size: 14px;
+            }
+
+            .upload-btn {
+                background-color: #03c75a;
+                color: white;
+                border: none;
+                padding: 12px 24px;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 14px;
+                font-weight: 600;
+                transition: background-color 0.3s ease;
+            }
+
+            .upload-btn:hover {
+                background-color: #02b050;
+            }
+
+            .upload-progress {
+                margin-top: 20px;
+            }
+
+            .progress-bar {
+                width: 100%;
+                height: 6px;
+                background-color: #e9ecef;
+                border-radius: 3px;
+                overflow: hidden;
+                margin-bottom: 10px;
+            }
+
+            .progress-fill {
+                height: 100%;
+                background-color: #03c75a;
+                width: 0%;
+                transition: width 0.3s ease;
+            }
+
+            /* 파일 목록 섹션 스타일 */
+            .files-section {
+                margin-top: 40px;
+            }
+
+            .section-title {
+                font-size: 20px;
+                color: #333;
+                margin-bottom: 20px;
+                text-align: left;
+            }
+
+            .files-list {
+                background-color: #f8f9fa;
+                border-radius: 8px;
+                padding: 20px;
+                margin-bottom: 20px;
+                min-height: 200px;
+                max-height: 400px;
+                overflow-y: auto;
+            }
+
+            .file-item {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 12px 16px;
+                margin-bottom: 8px;
+                background-color: white;
+                border-radius: 6px;
+                border: 1px solid #e9ecef;
+                transition: all 0.2s ease;
+            }
+
+            .file-item:hover {
+                border-color: #03c75a;
+                box-shadow: 0 2px 4px rgba(3, 199, 90, 0.1);
+            }
+
+            .file-info {
+                flex: 1;
+                text-align: left;
+            }
+
+            .file-name {
+                font-weight: 600;
+                color: #333;
+                margin-bottom: 4px;
+            }
+
+            .file-details {
+                font-size: 12px;
+                color: #666;
+            }
+
+            .file-actions {
+                display: flex;
+                gap: 8px;
+            }
+
+            .action-btn {
+                padding: 6px 12px;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 12px;
+                font-weight: 600;
+                transition: all 0.2s ease;
+            }
+
+            .download-btn {
+                background-color: #03c75a;
+                color: white;
+            }
+
+            .download-btn:hover {
+                background-color: #02b050;
+            }
+
+            .delete-btn {
+                background-color: #dc3545;
+                color: white;
+            }
+
+            .delete-btn:hover {
+                background-color: #c82333;
+            }
+
+            .refresh-btn {
+                background-color: #6c757d;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 14px;
+                font-weight: 600;
+                transition: background-color 0.3s ease;
+            }
+
+            .refresh-btn:hover {
+                background-color: #5a6268;
+            }
+
+            .empty-state {
+                text-align: center;
+                color: #666;
+                font-style: italic;
+                padding: 40px 20px;
+            }
+
+            .notification {
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 12px 20px;
+                border-radius: 4px;
+                color: white;
+                font-weight: 600;
+                z-index: 1000;
+                transform: translateX(100%);
+                transition: transform 0.3s ease;
+            }
+
+            .notification.show {
+                transform: translateX(0);
+            }
+
+            .notification.success {
+                background-color: #28a745;
+            }
+
+            .notification.error {
+                background-color: #dc3545;
+            }
+        </style>
+        <!-- 카카오 지도 API 스크립트 -->
+        <script
+            type="text/javascript"
+            src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=e6d1213031529597da18dae5ea957ec9"
+        ></script>
+    </head>
+    <body>
+        <div class="main-layout">
+            <!-- 지도 섹션 -->
+            <div class="map-section">
+                <div class="map-container">
+                    <h2 class="map-title">📍 위치 정보</h2>
+                    <div id="map"></div>
+                    <div style="margin-top: 15px; text-align: center">
+                        <p style="color: #666; font-size: 14px">카카오 지도 API를 사용한 지도 서비스</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 컨텐츠 섹션 -->
+            <div class="content-section">
+                <div class="container">
+                    <h1 class="main-title">test</h1>
+                    <div class="divider"></div>
+                    <p class="subtitle">파일 업로드 & 다운로드 서비스</p>
+
+                    <!-- 파일 업로드 섹션 -->
+                    <div class="upload-section">
+                        <div class="upload-area" id="uploadArea">
+                            <div class="upload-icon">📁</div>
+                            <p class="upload-text">파일을 드래그 앤 드롭하거나 클릭하여 업로드</p>
+                            <input type="file" id="fileInput" multiple style="display: none" />
+                            <button class="upload-btn" onclick="document.getElementById('fileInput').click()">
+                                파일 선택
+                            </button>
+                        </div>
+                        <div id="uploadProgress" class="upload-progress" style="display: none">
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="progressFill"></div>
+                            </div>
+                            <p id="progressText">업로드 중...</p>
+                        </div>
+                    </div>
+
+                    <!-- 파일 목록 섹션 -->
+                    <div class="files-section">
+                        <h3 class="section-title">업로드된 파일</h3>
+                        <div id="filesList" class="files-list">
+                            <!-- 파일 목록이 여기에 동적으로 추가됩니다 -->
+                        </div>
+                        <button class="refresh-btn" onclick="loadFiles()">새로고침</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            // 전역 변수
+            let uploadArea = document.getElementById("uploadArea");
+            let fileInput = document.getElementById("fileInput");
+            let filesList = document.getElementById("filesList");
+            let uploadProgress = document.getElementById("uploadProgress");
+            let progressFill = document.getElementById("progressFill");
+            let progressText = document.getElementById("progressText");
+
+            // 페이지 로드 시 파일 목록 불러오기 및 지도 초기화
+            document.addEventListener("DOMContentLoaded", function () {
+                loadFiles();
+
+                // 카카오 지도 API가 로드될 때까지 기다렸다가 초기화
+                if (typeof kakao !== "undefined") {
+                    initializeMap();
+                } else {
+                    // 1초 후 다시 시도
+                    setTimeout(function () {
+                        if (typeof kakao !== "undefined") {
+                            initializeMap();
+                        } else {
+                            // 2초 후 한 번 더 시도
+                            setTimeout(function () {
+                                initializeMap();
+                            }, 2000);
+                        }
+                    }, 1000);
+                }
+            });
+
+            // 카카오 지도 초기화
+            function initializeMap() {
+                // kakao 객체가 로드되었는지 확인
+                if (typeof kakao === "undefined") {
+                    console.error("카카오 지도 API가 로드되지 않았습니다.");
+                    showMapError("카카오 지도 API 로딩 실패", "네트워크 연결을 확인하거나 잠시 후 다시 시도해주세요.");
+                    return;
+                }
+
+                try {
+                    var container = document.getElementById("map");
+
+                    if (!container) {
+                        console.error("지도 컨테이너를 찾을 수 없습니다.");
+                        return;
+                    }
+
+                    var options = {
+                        center: new kakao.maps.LatLng(37.566826, 126.9786567), // 서울시청 좌표
+                        level: 3, // 지도의 확대 레벨
+                    };
+
+                    var map = new kakao.maps.Map(container, options);
+
+                    // 마커 생성
+                    var markerPosition = new kakao.maps.LatLng(37.566826, 126.9786567);
+                    var marker = new kakao.maps.Marker({
+                        position: markerPosition,
+                    });
+
+                    // 마커를 지도에 표시
+                    marker.setMap(map);
+
+                    // 인포윈도우 생성
+                    var infowindow = new kakao.maps.InfoWindow({
+                        content: '<div style="padding:5px; font-size:12px;">test의 파일 서버 📍</div>',
+                    });
+
+                    // 마커 클릭 이벤트
+                    kakao.maps.event.addListener(marker, "click", function () {
+                        infowindow.open(map, marker);
+                    });
+
+                    console.log("지도가 성공적으로 로드되었습니다.");
+
+                    // 성공 알림
+                    showNotification("지도가 성공적으로 로드되었습니다! 🗺️", "success");
+                } catch (error) {
+                    console.error("지도 로드 중 오류:", error);
+
+                    if (error.message.includes("API키")) {
+                        showMapError("API 키 오류", "카카오 개발자 사이트에서 도메인 등록을 확인해주세요.");
+                    } else {
+                        showMapError("지도 로딩 오류", error.message);
+                    }
+                }
+            }
+
+            // 지도 오류 표시 함수
+            function showMapError(title, message) {
+                var mapContainer = document.getElementById("map");
+                mapContainer.innerHTML = `
+                 <div style="display: flex; align-items: center; justify-content: center; height: 100%; background-color: #f8f9fa; border-radius: 6px; flex-direction: column; padding: 20px;">
+                     <div style="font-size: 48px; margin-bottom: 20px;">⚠️</div>
+                     <h3 style="color: #dc3545; margin-bottom: 10px;">${title}</h3>
+                     <p style="color: #666; text-align: center; font-size: 14px; line-height: 1.5; margin-bottom: 20px;">
+                         ${message}
+                     </p>
+                     <div style="background-color: #fff3cd; border: 1px solid #ffeaa7; border-radius: 4px; padding: 15px; font-size: 12px; color: #856404;">
+                         <strong>해결 방법:</strong><br>
+                         1. <a href="https://developers.kakao.com" target="_blank" style="color: #03c75a;">카카오 개발자 사이트</a> → 내 애플리케이션<br>
+                         2. 플랫폼 설정 → Web 플랫폼에 <code>http://localhost:3000</code> 등록<br>
+                         3. JavaScript 키가 올바른지 확인<br>
+                         4. 페이지 새로고침 (Ctrl + F5)
+                     </div>
+                 </div>
+             `;
+            }
+
+            // 드래그 앤 드롭 이벤트 처리
+            uploadArea.addEventListener("dragover", function (e) {
+                e.preventDefault();
+                uploadArea.classList.add("dragover");
+            });
+
+            uploadArea.addEventListener("dragleave", function (e) {
+                e.preventDefault();
+                uploadArea.classList.remove("dragover");
+            });
+
+            uploadArea.addEventListener("drop", function (e) {
+                e.preventDefault();
+                uploadArea.classList.remove("dragover");
+
+                const files = Array.from(e.dataTransfer.files);
+                uploadFiles(files);
+            });
+
+            // 파일 선택 이벤트 처리
+            fileInput.addEventListener("change", function (e) {
+                const files = Array.from(e.target.files);
+                uploadFiles(files);
+            });
+
+            // 파일 업로드 함수
+            async function uploadFiles(files) {
+                if (files.length === 0) return;
+
+                for (let file of files) {
+                    await uploadSingleFile(file);
+                }
+
+                // 업로드 완료 후 파일 목록 새로고침
+                loadFiles();
+            }
+
+            // 단일 파일 업로드
+            async function uploadSingleFile(file) {
+                const formData = new FormData();
+                formData.append("file", file);
+
+                try {
+                    showProgress();
+                    updateProgress(0, `${file.name} 업로드 중...`);
+
+                    const response = await fetch("/api/upload", {
+                        method: "POST",
+                        body: formData,
+                    });
+
+                    const result = await response.json();
+
+                    if (response.ok) {
+                        updateProgress(100, "업로드 완료!");
+                        showNotification(result.message, "success");
+                        setTimeout(hideProgress, 2000);
+                    } else {
+                        throw new Error(result.error || "업로드 실패");
+                    }
+                } catch (error) {
+                    console.error("Upload error:", error);
+                    showNotification("업로드 중 오류가 발생했습니다: " + error.message, "error");
+                    hideProgress();
+                }
+            }
+
+            // 파일 목록 불러오기
+            async function loadFiles() {
+                try {
+                    const response = await fetch("/api/files");
+                    const files = await response.json();
+
+                    displayFiles(files);
+                } catch (error) {
+                    console.error("Load files error:", error);
+                    showNotification("파일 목록을 불러오는 중 오류가 발생했습니다.", "error");
+                }
+            }
+
+            // 파일 목록 표시
+            function displayFiles(files) {
+                filesList.innerHTML = "";
+
+                if (files.length === 0) {
+                    filesList.innerHTML = '<div class="empty-state">업로드된 파일이 없습니다.</div>';
+                    return;
+                }
+
+                files.forEach((file) => {
+                    const fileItem = createFileItem(file);
+                    filesList.appendChild(fileItem);
+                });
+            }
+
+            // 파일 아이템 생성
+            function createFileItem(file) {
+                const div = document.createElement("div");
+                div.className = "file-item";
+
+                const fileSize = formatFileSize(file.size);
+                const uploadDate = new Date(file.uploadDate).toLocaleString("ko-KR");
+
+                div.innerHTML = `
+                 <div class="file-info">
+                     <div class="file-name">${escapeHtml(file.originalName)}</div>
+                     <div class="file-details">${fileSize} • ${uploadDate}</div>
+                 </div>
+                 <div class="file-actions">
+                     <button class="action-btn download-btn" onclick="downloadFile('${encodeURIComponent(
+                         file.filename
+                     )}', '${escapeHtml(file.originalName)}')">
+                         다운로드
+                     </button>
+                     <button class="action-btn delete-btn" onclick="deleteFile('${encodeURIComponent(file.filename)}')">
+                         삭제
+                     </button>
+                 </div>
+             `;
+
+                return div;
+            }
+
+            // 파일 다운로드
+            function downloadFile(filename, originalName) {
+                const link = document.createElement("a");
+                link.href = `/api/download/${filename}`;
+                link.download = originalName;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+
+                showNotification("파일 다운로드를 시작합니다.", "success");
+            }
+
+            // 파일 삭제
+            async function deleteFile(filename) {
+                if (!confirm("정말로 이 파일을 삭제하시겠습니까?")) {
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`/api/files/${filename}`, {
+                        method: "DELETE",
+                    });
+
+                    const result = await response.json();
+
+                    if (response.ok) {
+                        showNotification(result.message, "success");
+                        loadFiles(); // 파일 목록 새로고침
+                    } else {
+                        throw new Error(result.error || "삭제 실패");
+                    }
+                } catch (error) {
+                    console.error("Delete error:", error);
+                    showNotification("파일 삭제 중 오류가 발생했습니다: " + error.message, "error");
+                }
+            }
+
+            // 진행률 표시
+            function showProgress() {
+                uploadProgress.style.display = "block";
+            }
+
+            function hideProgress() {
+                uploadProgress.style.display = "none";
+                progressFill.style.width = "0%";
+            }
+
+            function updateProgress(percent, text) {
+                progressFill.style.width = percent + "%";
+                progressText.textContent = text;
+            }
+
+            // 알림 표시
+            function showNotification(message, type = "success") {
+                // 기존 알림 제거
+                const existingNotification = document.querySelector(".notification");
+                if (existingNotification) {
+                    existingNotification.remove();
+                }
+
+                const notification = document.createElement("div");
+                notification.className = `notification ${type}`;
+                notification.textContent = message;
+
+                document.body.appendChild(notification);
+
+                // 애니메이션을 위한 지연
+                setTimeout(() => {
+                    notification.classList.add("show");
+                }, 100);
+
+                // 3초 후 자동 제거
+                setTimeout(() => {
+                    notification.classList.remove("show");
+                    setTimeout(() => {
+                        if (notification.parentNode) {
+                            notification.parentNode.removeChild(notification);
+                        }
+                    }, 300);
+                }, 3000);
+            }
+
+            // 파일 크기 포맷팅
+            function formatFileSize(bytes) {
+                if (bytes === 0) return "0 Bytes";
+
+                const k = 1024;
+                const sizes = ["Bytes", "KB", "MB", "GB"];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
+            }
+
+            // HTML 이스케이프
+            function escapeHtml(text) {
+                const div = document.createElement("div");
+                div.textContent = text;
+                return div.innerHTML;
+            }
+        </script>
+    </body>
+</html>
